@@ -225,7 +225,7 @@ export default {
         series: [
           {
             name: "账号登陆个数",
-            type: "bar",
+            type: "line",
             data: this.yData,
           }
         ],

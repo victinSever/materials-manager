@@ -90,6 +90,15 @@
                 <el-form-item label="调度时间" label-width="80px">
                   <span>{{ props.row.createTime }}</span>
                 </el-form-item>
+                <el-form-item label="物资类型" label-width="80px">
+                  <span>{{ props.row.type }}</span>
+                </el-form-item>
+                <el-form-item label="总数" label-width="80px">
+                  <span>{{ props.row.sum }}</span>
+                </el-form-item>
+                <el-form-item label="单位" label-width="80px">
+                  <span>{{ props.row.unite }}</span>
+                </el-form-item>
               </el-form>
             </template>
           </el-table-column>
@@ -101,46 +110,60 @@
               <el-tag type="warning" v-if="scope.row.isPut === 0">出库</el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="state" label="状态" width="100">
+          <el-table-column prop="state" label="状态">
             <template v-slot:default="scope">
               <el-tag
                 size="mini"
                 type="danger"
                 effect="plain"
-                v-if="scope.row.state == 1"
+                v-if="scope.row.state == -2"
+                >异常</el-tag
+              >
+              <el-tag
+                size="mini"
+                type="danger"
+                effect="plain"
+                v-if="scope.row.state == -1"
+                >手动关闭</el-tag
+              >
+              <el-tag
+                size="mini"
+                type="danger"
+                effect="plain"
+                v-if="scope.row.state == 0"
                 >未出库</el-tag
               >
               <el-tag
                 size="mini"
                 type="success"
                 effect="plain"
-                v-if="scope.row.state == 2"
+                v-if="scope.row.state == 1"
                 >配货成功</el-tag
               >
               <el-tag
                 size="mini"
                 type="success"
                 effect="plain"
-                v-if="scope.row.state == 3"
+                v-if="scope.row.state == 2"
                 >出库成功</el-tag
               >
               <el-tag
                 size="mini"
                 type="warning"
                 effect="plain"
-                v-if="scope.row.state == 4"
+                v-if="scope.row.state == 3"
                 >运输中</el-tag
               >
               <el-tag
                 size="mini"
                 effect="plain"
                 type="success"
-                v-if="scope.row.state == 5"
+                v-if="scope.row.state == 4"
                 >配送完成</el-tag
               >
             </template>
           </el-table-column>
-          <el-table-column prop="dispatchType" label="调度类型" width="100">
+          <el-table-column prop="dispatchType" label="调度类型">
             <template v-slot:default="scope">
               <el-tag
                 size="mini"
@@ -214,18 +237,13 @@
               >
             </template>
           </el-table-column>
-          <el-table-column
-            prop="id"
-            label="调度单号"
-            width="180"
-          ></el-table-column>
+          <el-table-column prop="id" label="调度单号"></el-table-column>
 
           <el-table-column
             prop="content"
             label="物资调度描述"
-            width="180"
           ></el-table-column>
-          <el-table-column prop="level" label="紧急程度" width="100">
+          <el-table-column prop="level" label="紧急程度">
             <template v-slot:default="scope">
               <el-rate show-score disabled v-model="scope.row.level"></el-rate>
             </template>
@@ -233,32 +251,15 @@
           <el-table-column
             prop="storehouseName"
             label="调度仓库"
-            width="180"
           ></el-table-column>
           <el-table-column
             prop="materialsName"
             label="物资名称"
-            width="180"
-          ></el-table-column>
-          <el-table-column
-            prop="type"
-            label="物资类型"
-            width="180"
-          ></el-table-column>
-          <el-table-column
-            prop="sum"
-            label="总数"
-            width="100"
-          ></el-table-column>
-          <el-table-column
-            prop="unite"
-            label="单位"
-            width="100"
           ></el-table-column>
 
-          <el-table-column label="操作" width="180">
+          <el-table-column label="操作" width="270">
             <template slot-scope="scope">
-              <el-popover placement="right" width="400" trigger="hover">
+              <el-popover placement="top" width="200" trigger="hover">
                 <!-- <h2>{{scope.row.id}}</h2> -->
                 <span>暂时没有更多细节</span>
                 <el-link
@@ -269,6 +270,12 @@
                   >更多</el-link
                 >
               </el-popover>
+              <el-link
+                icon="el-icon-phone"
+                :underline="false"
+                @click="sureUpdateState(scope.row)"
+                >修改状态</el-link
+              >
               <el-link
                 icon="el-icon-delete"
                 :underline="false"
@@ -288,7 +295,7 @@
           :page-size="this.queryMap.pageSize"
           layout="total, sizes, prev, pager, next, jumper"
           :total="this.total"
-          style="margin-top: 20px;"
+          style="margin-top: 20px"
         ></el-pagination>
       </el-row>
       <el-empty v-else description="未找到记录" :image-size="150"></el-empty>
@@ -346,6 +353,62 @@ export default {
   },
 
   methods: {
+    //确认修改状态
+    sureUpdateState(data){
+      if(localStorage.getItem('role') !== '管理员'){
+        return this.$message.warning("你的管理员权限不足！");
+      }
+      let str = `您确定要修改该状态? 状态依次变化为：未出库(0)->配货成功(1)->出库成功(2)->运输中(3)->配送完成(4)，你修改的单号为${data.id}的状态为${data.state}`;
+      this.$confirm(str, "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          this.updateOne(data);
+          this.$message.success("修改成功！");
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消修改",
+          });
+        });
+    },
+
+    //修改状态
+    async updateOne(data) {
+      let url = "";
+      switch (data.state) {
+        case 0:
+          url = "records/checkDone";
+          break;
+        case 1:
+          url = "records/checkOut";
+          break;
+        case 2:
+          url = "records/finish";
+          break;
+        case 3:
+          url = "records/finish";
+          break;
+        default: {
+          return this.$message.warning("此类状态不能更改！");
+        }
+      }
+      try {
+        const res = await this.$http.post(url, [data.id]);
+        if(res.status === 200){
+          location.reload(); //刷新
+          this.$message.success(
+          "状态更改成功！单号为：" + data.id + "，现在状态：" + data.state
+        );
+        }
+      } catch (err) {
+        this.$message.warning("出错了！");
+      }
+    },
+
     //转数据
     dateChangeTo() {
       const params = {
@@ -358,6 +421,7 @@ export default {
       };
       return params;
     },
+
     //查询
     async search() {
       // this.queryMap.pageNum = 1;
@@ -385,18 +449,20 @@ export default {
         this.showTable = false;
         return this.$message.error("获取列表失败");
       } else {
-        this.showTable = true;       
+        this.showTable = true;
         this.tableData = res.data.list;
-        this.getTotal();
+        this.total = res.data.totalCount;
       }
     },
 
     //查询物资总数
-    async getTotal(){
-      const data =  JSON.parse(JSON.stringify(this.queryMap));
-      delete(data.start);
-      delete(data.limit);
-      const res = await this.$http.get("records/selectByConditionalCount",{params: data});
+    async getTotal() {
+      const data = JSON.parse(JSON.stringify(this.queryMap));
+      delete data.start;
+      delete data.limit;
+      const res = await this.$http.get("records/selectByConditionalCount", {
+        params: data,
+      });
       this.total = res.data;
     },
 
@@ -469,5 +535,8 @@ export default {
   label {
     color: #99a9bf !important;
   }
+}
+.el-link {
+  margin: 0 10px;
 }
 </style>

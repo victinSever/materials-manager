@@ -24,10 +24,10 @@
               <el-form-item prop="dispatchType" label="调度类型" width="100">
                 <el-select v-model="inRecordInf.dispatchType" clearable>
                   <el-option
-                    v-for="item in dispatchTypes"
-                    :key="item"
+                    v-for="(item,index) in dispatchTypes"
+                    :key="index"
                     :label="item"
-                    :value="item"
+                    :value="index"
                   ></el-option>
                 </el-select>
               </el-form-item>
@@ -358,14 +358,8 @@ export default {
     //获取仓库
     async getStockName() {
       const res = await this.$http.get("storehouse/searchAllStorehouseName");
-      this.stocks = res.data.data.storehouse;
+      this.stocks = res.data.data.storehouse.reverse();
     },
-
-    //获取物资信息
-    // async searchAllStorehouse(){
-    //   const res = await this.$http.get('storehouse/searchAllStorehouse');
-    //   console.log(res);
-    // },
 
     //获取调度类型
     async getDispatchType() {
@@ -379,7 +373,7 @@ export default {
       this.tableData.forEach((item) => {
         data.push({
           materialsName: item.name,
-          type: item.type[item.type.length - 1],
+          type: "0",
           level: this.inRecordInf.level + "",
           sum: item.count + "",
           phone: this.inRecordInf.phone,
@@ -393,16 +387,17 @@ export default {
           unite: item.unit,
           isPut: 1 + "", //入库
           dispatchType: this.inRecordInf.dispatchType,
+          category1: item.type[item.type.length - 1],
+          category2: ""
         });
       });
-      console.log(data);
       return data;
     },
 
     //发送信息
     async sendData(data, index) {
       try {
-        const res = await this.$http.post("record/pop", data);
+        const res = await this.$http.post("record/push", data);
         if (res.status === 200) {
           //成功后，添加日志
           this.$emit("addLogs", this.inRecordInf);

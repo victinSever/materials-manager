@@ -124,7 +124,7 @@ export default {
       try {
         const res = await this.$http.get("materials/show_type");
         if (res.status === 200) {
-          const data = res.data.data.show_type.list;
+          const data = res.data.data.show_type.list;       
 
           //递归生成前端所需的生成树
           const maps = (data) => {

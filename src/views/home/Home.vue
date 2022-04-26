@@ -9,18 +9,24 @@
           </h1>
         </div>
         <div class="home-header-Info">
-          <div class="user_avatar_search user_avatar_i">
-            <i class="el-icon-search" @click="$router.push('/products')"></i>
+          <div class="user_avatar_search user_avatar_i"  @click="$router.push('/products')">
+            <i class="el-icon-search"></i>
           </div>
-          <div class="user_avatar_bell user_avatar_i">
+          <div class="user_avatar_bell user_avatar_i"  @click="$router.push('/logs')">
             <el-tooltip
               class="item"
               effect="light"
               transition="el-fade-in-linear"
               placement="bottom"
             >
-              <div slot="content">你有{{ messageNum }}则新的消息未查看哦！</div>
-              <el-badge :value="messageNum" class="item">
+              <div slot="content">
+                <span v-if="messageNum != 0">你有{{ messageNum }}则新的消息未查看哦！</span>
+                <span v-else>暂时没有需要查阅的邮件！</span>
+              </div>
+              <el-badge v-if="messageNum!=0" :value="emailNum" class="item" type="primary">
+                <i class="el-icon-bell"></i>
+              </el-badge>
+              <el-badge v-else is-dot class="item">
                 <i class="el-icon-bell"></i>
               </el-badge>
             </el-tooltip>
@@ -459,7 +465,7 @@ export default {
         },
       ], //菜单栏数据
       activepath: "", //点击二级菜单获取的下标
-      messageNum: 1, //消息数量
+      messageNum: 0, //消息数量
       emailNum: 0, //邮件数量
     };
   },

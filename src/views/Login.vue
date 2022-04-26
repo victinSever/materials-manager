@@ -16,7 +16,13 @@
 
       <div class="form-box">
         <el-card>
-          <marquee loop="2" width="360px" scrollAmount="2"  onMouseOver="this.stop()" onMouseOut="this.start()" >
+          <marquee
+            loop="2"
+            width="360px"
+            scrollAmount="2"
+            onMouseOver="this.stop()"
+            onMouseOut="this.start()"
+          >
             没有账号？请点击右上角注册
           </marquee>
           <el-form
@@ -24,6 +30,7 @@
             :rules="formRules"
             status-icon
             :model="formData"
+            @submit.native.prevent
           >
             <!-- 标题 -->
             <h1 class="title">医疗物资管理系统</h1>
@@ -33,7 +40,7 @@
                 prefix-icon="el-icon-user"
                 v-model="formData.account"
                 placeholder="账号"
-                :change="submitFormData"
+                @keyup.enter.native="submitFormData"
                 maxlength="20"
               ></el-input>
             </el-form-item>
@@ -45,7 +52,7 @@
                 v-model="formData.password"
                 placeholder="密码"
                 maxlength="20"
-                :change="submitFormData"
+                @keyup.enter.native="submitFormData"
               ></el-input>
             </el-form-item>
             <!-- 4位验证码 -->
@@ -56,7 +63,7 @@
                   prefix-icon="el-icon-mobile"
                   class="verify_code"
                   placeholder="验证码"
-                  @change="submitFormData"
+                  @keyup.enter.native="submitFormData"
                 ></el-input>
                 <img
                   :src="imgCode"
@@ -138,7 +145,7 @@ export default {
         ],
         password: [
           { required: true, message: "请输入密码", trigger: "blur" },
-          { min: 4, max: 6, message: "长度在 4 到 6 个字符", trigger: "blur" },
+          { min: 4, max: 15, message: "长度在 4 到 15 个字符", trigger: "blur" },
         ],
         verifyCode: [
           { required: true, message: "请输入验证码", trigger: "blur" },
@@ -172,26 +179,30 @@ export default {
 
     //加载图形验证码
     async uploadeImgCode() {
-      const res = await this.$http({
-        method: "get",
-        url: "user/showCode",
-        responseType: "arraybuffer",
-      });
-      if (res.status === 200) {
-        console.log(res);
-        let binaryData = [];
-        binaryData.push(res.data);
-        this.imgCode = window.URL.createObjectURL(new Blob(binaryData));//获取验证码图片
-        this.code = res.headers.code.toLowerCase();
-      } else {
-        this.$message.error("服务器未响应！");
+      try {
+        const res = await this.$http({
+          method: "get",
+          url: "user/showCode",
+          responseType: "arraybuffer",
+        });
+        if (res.status === 200) {
+          console.log(res);
+          let binaryData = [];
+          binaryData.push(res.data);
+          this.imgCode = window.URL.createObjectURL(new Blob(binaryData)); //获取验证码图片
+          this.code = res.headers.code.toLowerCase();
+        } else {
+          this.$message.error("访问错误！");
+        }
+      } catch (err) {
+        this.$message.error("好像服务器跑丢了哦！");
       }
     },
 
     //验证码通过之后的回调
-    async success(msg) {     
+    async success(msg) {
       //判断验证码的正误
-      if(this.code !== this.formData.verifyCode.toLowerCase()){
+      if (this.code !== this.formData.verifyCode.toLowerCase()) {
         this.isShow = false;
         return this.$message.error("验证码出错！");
       }
@@ -206,13 +217,13 @@ export default {
           this.$message.error("账号或密码错误！");
           this.isShow = false;
         } else {
-          const data = res.data.data;         
+          const data = res.data.data;
 
-          sessionStorage.setItem("token", data.token); //保存本地token     
+          sessionStorage.setItem("token", data.token); //保存本地token
 
           //记住密码则保存在本地session中
           if (this.checked) {
-            sessionStorage.setItem("account", this.formData.account); 
+            sessionStorage.setItem("account", this.formData.account);
             sessionStorage.setItem("password", this.formData.password);
           } else {
             sessionStorage.removeItem("account");
@@ -220,25 +231,25 @@ export default {
           }
 
           //将用户信息放在local暂存
-          localStorage.setItem('account', data.user.account);
-          localStorage.setItem('department', data.user.department);
-          localStorage.setItem('password', data.user.password);
-          localStorage.setItem('role', data.user.role);
-          localStorage.setItem('userName', data.user.userName);
+          localStorage.setItem("account", data.user.account);
+          localStorage.setItem("department", data.user.department);
+          localStorage.setItem("password", data.user.password);
+          localStorage.setItem("role", data.user.role);
+          localStorage.setItem("userName", data.user.userName);
 
-          this.$store.commit("setUserInfo",data.user);//存放用户信息
+          this.$store.commit("setUserInfo", data.user); //存放用户信息
 
           //七天登录数据
-          localStorage.setItem("recent_login", data.recent_login);  
-          this.$store.commit("setRecentLogin",data.recent_login);//存放用户信息
-                  
+          localStorage.setItem("recent_login", data.recent_login);
+          this.$store.commit("setRecentLogin", data.recent_login); //存放用户信息
+
           this.$message.success(
-            "登陆成功！欢迎，"+ data.user.role + data.user.account
+            "登陆成功！欢迎，" + data.user.role + data.user.userName
           );
           this.$router.push({ path: "/home" });
           location.reload();
         }
-      }else{
+      } else {
         this.$message.error("服务器出错了!");
       }
     },
@@ -302,7 +313,7 @@ marquee {
   position: absolute;
   top: 10px;
   background: transparent;
-   color: rgba(170, 169, 169, 0.8);
-   font-size: 12px;
+  color: rgba(170, 169, 169, 0.8);
+  font-size: 12px;
 }
 </style>

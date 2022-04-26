@@ -82,7 +82,10 @@ export default {
   data() {
     return {
       total: 0,
-      queryMap: {},
+      queryMap: {
+        pageNum: 1,
+        pageSize: 10
+      },
       annexLists: [],
       srcList: [],
       centerDialogVisible: false,
@@ -94,30 +97,12 @@ export default {
   methods: {
     //删除附件
     async deleteImg(id) {
-      const { data: res } = await this.$http.delete("upload/delete/" + id);
-      console.log(res);
-      if (res.code !== 100) {
-        return this.$message.error("删除附件失败");
-      } else {
-        return this.$message, success("删除附件成功");
-      }
+      this.$message.error("未开放！");
     },
 
     //请求附件数据
     async getImgLists() {
-      const { data: res } = await this.$http.get("upload/findImageList", {
-        params: this.queryMap,
-      });
-      if (res.code !== 200) {
-        return this.$message.error("请求附件数据失败");
-      } else {
-        this.total = res.data.total;
-        this.annexLists = res.data.list;
-        this.srcList = res.data.list.map((item) => {
-          return "https://www.zykhome.club/" + item.path;
-        });
-      }
-      console.log(res);
+      this.$message.warning("未开放附件功能！");
     },
 
     handleSizeChange(newSize) {

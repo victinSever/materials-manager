@@ -12,7 +12,7 @@
           <el-form
             :model="outRecordInf"
             :rules="outRecordInfRules"
-            ref="inRecordInf"
+            ref="outRecordInf"
             label-width="140px"
             class="form food_form"
           >
@@ -66,16 +66,31 @@
               </el-select>
             </el-form-item>
 
+            <el-form-item label="出库类型" prop="dispatchType">
+              <el-select
+                v-model="outRecordInf.dispatchType"
+                placeholder="请选择"
+                style="width: 100px"
+              >
+                <el-option
+                  v-for="item in dispatchTypes"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+
             <el-form-item label="方式" prop="way" style="display: block">
               <el-select
                 v-model="outRecordInf.way"
                 placeholder="请选择"
                 style="width: 100px"
               >
-                <el-option label="车载" :value="0"></el-option>
-                <el-option label="空运" :value="1"></el-option>
-                <el-option label="轮渡" :value="2"></el-option>
-                <el-option label="人力" :value="3"></el-option>
+                <el-option label="车载" value="车载"></el-option>
+                <el-option label="空运" value="空运"></el-option>
+                <el-option label="轮渡" value="轮渡"></el-option>
+                <el-option label="人力" value="人力"></el-option>
               </el-select>
             </el-form-item>
 
@@ -84,9 +99,7 @@
             </el-form-item>
 
             <el-form-item label=" ">
-              <el-button type="primary" @click="submitInRecordInf()"
-                >提交</el-button
-              >
+              <el-button type="primary" @click="submitData()">提交</el-button>
             </el-form-item>
           </el-form>
         </el-card>
@@ -100,13 +113,7 @@
         <h2 style="margin-bottom: 10px">已选择物资</h2>
         <el-card>
           <el-col :span="22" :offset="1">
-            <!-- <el-input-number
-            :min="0"
-            :max="1000000"
-            style="width: 150px"
-            @click="addNum(scope.row)"
-          ></el-input-number> -->
-          <el-table
+            <el-table
               :data="selectStock"
               :header-cell-style="{ 'text-align': 'center' }"
               :cell-style="{ 'text-align': 'center' }"
@@ -124,7 +131,7 @@
                 label="型号"
                 prop="specification"
               ></el-table-column>
-              <el-table-column label="已选择数量" prop="seleted"></el-table-column>
+              <el-table-column label="已选择数量" prop="sum"> </el-table-column>
             </el-table>
           </el-col>
         </el-card>
@@ -201,9 +208,20 @@
               ></el-table-column>
               <el-table-column label="操作">
                 <template slot-scope="scope">
-                  <el-button type="primary" @click="addNum(scope.row)"
-                    >选择</el-button
+                  <el-popover
+                    placement="top"
+                    title="输入数量"
+                    width="200"
+                    trigger="click"
                   >
+                    <el-input
+                      v-model="selectNum"
+                      placeholder="0"
+                      style="width: 150px"
+                      @change="addNum(scope.row, selectNum)"
+                    ></el-input>
+                    <el-button slot="reference" type="primary">选择</el-button>
+                  </el-popover>
                 </template>
               </el-table-column>
             </el-table>
@@ -246,12 +264,11 @@ export default {
       tableData: [],
       communitys: [], //社区名称，获取 100
       categorys: [], //种类
+      dispatchTypes: [],
       type: [], //选择的类型
 
       //选择的仓库
-      selectInf: {
-        selectCount: 0,
-      },
+      selectNum: "",
       selectStock: [],
 
       outRecordInf: {
@@ -261,10 +278,11 @@ export default {
         level: "", //紧急程度
         comminity: "",
         way: "",
+        dispatchType: "", //出库类型
       }, //入库信息
       outRecordInfRules: {
         dispatchType: [
-          { required: true, message: "请选择物资来源", trigger: "blur" },
+          { required: true, message: "请选择出库目的", trigger: "blur" },
         ],
         reason: [
           { required: true, message: "请描述入库原因", trigger: "blur" },
@@ -272,7 +290,10 @@ export default {
         stock: [
           { required: true, message: "请选择目标入库仓库", trigger: "blur" },
         ],
-        phone: [{ required: true, message: "请输入手机号", trigger: "blur" }],
+        phone: [
+          { required: true, message: "请输入手机号", trigger: "blur" },
+          { min: 11, max: 11, message: "手机号数不为11位", trigger: "blur" },
+        ],
         level: [
           { required: true, message: "请选择物资需求等级", trigger: "blur" },
         ],
@@ -316,11 +337,84 @@ export default {
     this.search();
     this.getStockName();
     this.getCategorys();
+    this.getDispatchType();
   },
   methods: {
+    //整理表格数据
+    makeInf() {
+      this.selectStock = this.selectStock.map((item) => {
+        return {
+          materialsName: item.name,
+          type: item.type,
+          level: this.outRecordInf.level + "",
+          sum: item.sum,
+          phone: this.outRecordInf.phone,
+          state: "0",
+          storehouseName: item.storeName,
+          userName: this.outRecordInf.userName,
+          way: this.outRecordInf.way,
+          communityName: this.outRecordInf.comminity,
+          content: this.outRecordInf.reason,
+          specification: item.specification,
+          unite: item.unite,
+          isPut: "0",
+          dispatchType: this.outRecordInf.dispatchType,
+        };
+      });
+    },
+
+    //提交
+    submitData() {
+      this.$refs["outRecordInf"].validate((valid) => {
+        if (!valid) {
+          this.$message.error("提交失败！");
+        } else if (this.selectStock.length === 0) {
+          this.$message.error("你还没有选择即将出库的物资！");
+        } else {
+          this.makeInf();
+          this.selectStock.forEach((item, index) => {
+            this.sendData(item, index);
+          });
+        }
+      });
+    },
+
+    async sendData(data, index) {
+      try {
+        const res = await this.$http.post("record/pop", data);
+        if (res.status === 200) {
+          //成功后，添加日志
+          this.$emit("addLogs", this.outRecordInf);
+          this.$store.commit("addLogs", {
+            opeName: "出库操作",
+            OpeTime: new Date().toLocaleString(),
+            list: data,
+          });
+
+          //清空
+          this.outRecordInf = {
+            userName: this.outRecordInf.userName
+          };
+          this.selectStock = [];
+          this.$message.success("成功提交！");
+        }
+      } catch (err) {
+        this.$message.error(
+          "第" + (index + 1) + "条记录生成记录失败！错误：" + err
+        );
+      }
+    },
+
     //addNum
-    addNum(data) {
-      console.log(data);
+    addNum(data, num) {
+      console.log(data, num);
+      if (num > data.quantity) {
+        return this.$message.error("数量不足！");
+      } else if (num === "0") {
+        return this.$message.error("数量不能为0！");
+      }
+      data.sum = num; //选择的数量
+      this.selectNum = "";
       this.selectStock.unshift(data);
     },
 
@@ -357,6 +451,20 @@ export default {
     async getStockName() {
       const res = await this.$http.get("storehouse/searchAllStorehouseName");
       this.stocks = res.data.data.storehouse.reverse();
+    },
+
+    //获取调度类型
+    async getDispatchType() {
+      const res = await this.$http.get("records/getDispatchType");
+      let keys = Object.keys(res.data);
+      let value = Object.values(res.data);
+      keys.forEach((item,index)=>{
+        this.dispatchTypes.push({
+          label: value[index],
+          value: item
+        })
+      })
+      console.log(this.dispatchTypes);
     },
 
     //获取社区

@@ -54,8 +54,8 @@
 </template>
 
 <script>
-import AddInRecord from "@/components/dialog/addInRrcord.vue";
-import AddOutRecord from "@/components/dialog/addOutRecord.vue";
+import AddInRecord from "@/components/addInRrcord.vue";
+import AddOutRecord from "@/components/addOutRecord.vue";
 export default {
   name: "outStocks",
   data() {

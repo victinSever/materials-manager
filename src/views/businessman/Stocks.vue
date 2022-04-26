@@ -238,7 +238,7 @@ export default {
       var barArt = this.$echarts.init(document.getElementById("barEchart"));
       var baroption = {
         title: {
-          text: "库存条形图",
+          text: "库存统计图",
         },
         toolbox: {
           show: true,
@@ -247,7 +247,7 @@ export default {
               yAxisIndex: "none",
             },
             dataView: { readOnly: false }, //  缩放
-            magicType: { type: ["bar"] }, ///　　折线  直方图切换
+            magicType: { type: ["bar","line"] }, ///　　折线  直方图切换
             restore: {}, // 重置
             saveAsImage: {}, // 导出图片
           },
@@ -264,7 +264,7 @@ export default {
         series: [
           {
             name: this.stockName,
-            type: "bar",
+            type: "line",
             barMinWidth: 2,
             showBackground: true,
             data: this.barData,

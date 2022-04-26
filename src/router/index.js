@@ -2,8 +2,8 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 
 // 登陆
-import Login from '../components/Login.vue'
-import Register from '../components/Register.vue'
+import Login from '../views/Login.vue'
+import Register from '../views/Register.vue'
 import Home from '../views/home/Home.vue'
 
 // 系统模块
@@ -55,7 +55,7 @@ const routes = [{
         path: '/home',
         component: Home,
         name: 'home',
-        // redirect: '/welcome',
+        redirect: '/welcome',
         children: [{
                 path: '/welcome', //主页
                 name: 'welcome',
@@ -172,7 +172,7 @@ const router = new VueRouter({
 
 //为路由对象加上导航守卫
 router.beforeEach((to, from, next) => {
-    // document.title = to.meta.title; //设置标题
+    document.title = to.meta.title; //设置标题
     if (to.path === '/login' || to.path === '/register') {
         next()
     } else {

@@ -75,8 +75,6 @@
 
 <script>
 import jsonp from "jsonp";
-import "echarts/map/js/china";
-import echarts from "echarts";
 const option = {
   title: {
     text: "疫情地图",
@@ -147,7 +145,7 @@ export default {
   },
   mounted() {
     this.getData();
-    this.mychart = echarts.init(document.getElementById("xinguanmap"));
+    this.mychart = this.$echarts.init(document.getElementById("xinguanmap"));
     this.mychart.setOption(option);
   },
   methods: {

@@ -193,11 +193,11 @@ export default {
         ],
         password: [
           { required: true, message: "请输入密码", trigger: "blur" },
-          { min: 4, max: 6, message: "长度在 4 到 6 个字符", trigger: "blur" },
+          { min: 4, max: 15, message: "长度在 4 到 15 个字符", trigger: "blur" },
         ],
         passwordS: [
           { required: true, message: "请再次输入", trigger: "blur" },
-          { min: 4, max: 6, message: "长度在 4 到 6 个字符", trigger: "blur" },
+          { min: 4, max: 15, message: "长度在 4 到 15 个字符", trigger: "blur" },
           {
             validator: validatePass,
             message: "两次输入密码不正确",
@@ -264,7 +264,7 @@ export default {
         if (res.status === 200) {
           
           this.resetForm();
-          this.$message.success("注册成功！");
+          this.$message.success("注册成功！正返回登陆");
           this.$router.push("/login");
         }
       } catch (err) {
@@ -274,18 +274,23 @@ export default {
 
     //加载图形验证码
     async uploadeImgCode() {
-      const res = await this.$http({
-        method: "get",
-        url: "user/showCode",
-        responseType: "arraybuffer",
-      });
-      if (res.status === 200) {
-        let binaryData = [];
-        binaryData.push(res.data);
-        this.imgCode = window.URL.createObjectURL(new Blob(binaryData));
-        this.code = res.headers.code.toLowerCase();
-      } else {
-        this.$message.error("服务器未响应！");
+      try {
+        const res = await this.$http({
+          method: "get",
+          url: "user/showCode",
+          responseType: "arraybuffer",
+        });
+        if (res.status === 200) {
+          console.log(res);
+          let binaryData = [];
+          binaryData.push(res.data);
+          this.imgCode = window.URL.createObjectURL(new Blob(binaryData)); //获取验证码图片
+          this.code = res.headers.code.toLowerCase();
+        } else {
+          this.$message.error("访问错误！");
+        }
+      } catch (err) {
+        this.$message.error("悄悄告诉你，服务器偷偷开小差去了！");
       }
     },
 
