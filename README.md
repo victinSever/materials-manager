@@ -1,25 +1,22 @@
-# materialsmanage
+# 疫情物资管理系统
+- 基于Vue+ElementUI+Echarts搭建的后台疫情物资调度系统
 
-## Project setup
+## 项目运行
 ```
 npm install
-```
-
-### Compiles and hot-reloads for development
-```
 npm run serve
-```
-
-### Compiles and minifies for production
-```
 npm run build
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## 项目技术
+- Vue作为主题框架
+- Vuex作为全局库
+- ElementUI为主要样式库
+- CSS3媒体动画技术制作背景页
+- Echarts搭建可视化图标和疫情地图
 
 
-### 接口
+### 模块设计
 - 登陆模块
     - 登陆
     - 注册
