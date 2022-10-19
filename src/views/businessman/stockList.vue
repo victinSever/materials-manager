@@ -20,7 +20,7 @@
         <el-form-item label="入库/出库" prop="isPut" label-width="100px">
           <el-select v-model="queryMap.isPut" style="width: 100px" clearable>
             <el-option label="入库" :value="1"></el-option>
-            <el-option label="出库" :value="0"></el-option>
+            <el-option label="出库" :value="2"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="调度类型" label-width="100px" prop="dispatchType">
@@ -43,11 +43,13 @@
         </el-form-item>
         <el-form-item label="状态" prop="state" label-width="80px">
           <el-select v-model="queryMap.state" style="width: 120px" clearable>
-            <el-option label="未出库" :value="1"></el-option>
-            <el-option label="配货成功" :value="2"></el-option>
-            <el-option label="出库成功" :value="3"></el-option>
-            <el-option label="运输中" :value="4"></el-option>
-            <el-option label="配送完成" :value="5"></el-option>
+            <el-option label="未出库" :value="-3"></el-option>
+            <el-option label="手动关闭" :value="-1"></el-option>
+            <el-option label="异常" :value="-2"></el-option>
+            <el-option label="配货成功" :value="1"></el-option>
+            <el-option label="出库成功" :value="2"></el-option>
+            <el-option label="运输中" :value="3"></el-option>
+            <el-option label="配送完成" :value="4"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label-width="20px" style="margin-left: 20px">
@@ -107,7 +109,7 @@
           <el-table-column prop="isPut" label="入库/出库" width="100">
             <template slot-scope="scope">
               <el-tag type="success" v-if="scope.row.isPut === 1">入库</el-tag>
-              <el-tag type="warning" v-if="scope.row.isPut === 0">出库</el-tag>
+              <el-tag type="warning" v-if="scope.row.isPut === 2">出库</el-tag>
             </template>
           </el-table-column>
           <el-table-column prop="state" label="状态">
@@ -130,7 +132,7 @@
                 size="mini"
                 type="danger"
                 effect="plain"
-                v-if="scope.row.state == 0"
+                v-if="scope.row.state == -3"
                 >未出库</el-tag
               >
               <el-tag
@@ -245,7 +247,7 @@
           ></el-table-column>
           <el-table-column prop="level" label="紧急程度">
             <template v-slot:default="scope">
-              <el-rate show-score disabled v-model="scope.row.level"></el-rate>
+              <el-rate disabled v-model="scope.row.level"></el-rate>
             </template>
           </el-table-column>
           <el-table-column
@@ -321,30 +323,6 @@ export default {
       dialogFormVisible: false,
       formLabelWidth: "120px",
       inRecordCategorys: [
-        {
-          value: "0",
-          label: "全部类型",
-        },
-        {
-          value: "1",
-          label: "政府发放",
-        },
-        {
-          value: "2",
-          label: "企业捐助",
-        },
-        {
-          value: "3",
-          label: "基金援助",
-        },
-        {
-          value: "4",
-          label: "个人援助",
-        },
-        {
-          value: "5",
-          label: "其他援助",
-        },
       ], //入库的类型
     };
   },

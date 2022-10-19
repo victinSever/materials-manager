@@ -24,7 +24,7 @@
               <el-form-item prop="dispatchType" label="调度类型" width="100">
                 <el-select v-model="inRecordInf.dispatchType" clearable>
                   <el-option
-                    v-for="(item,index) in dispatchTypes"
+                    v-for="(item, index) in dispatchTypes"
                     :key="index"
                     :label="item"
                     :value="index"
@@ -248,22 +248,17 @@
                 ></el-input-number>
               </el-form-item>
 
-              <el-form-item
-                label="样式图片"
-                prop="imgUrl"
-                style="display: block"
-              >
-                <div class="upload">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    @change="uploadImg"
-                    id="uploadInput"
-                    name="picture"
-                    alt=""
-                    multiple
-                  />
-                </div>
+              <el-form-item label="样式图片" style="display: block">
+                <el-upload
+                  class="avatar-uploader"
+                  action=""
+                  :show-file-list="false"
+                  :before-upload="beforeAvatarUpload"
+                >
+                  <img v-if="queryMap.imgUrl" :src="queryMap.imgUrl" class="avatar" style="height: 100px;"/>
+                  <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                </el-upload>
+
               </el-form-item>
 
               <el-form-item label=" ">
@@ -290,7 +285,8 @@ export default {
         count: 0,
         stock: "", //仓库
         status: "", //状态：0不足，1适中，2充足
-        imgUrl: null,
+        imgUrl: null, //显示的图片
+        file: null, //图片的信息
         unit: "", //单位
         size: "", //模式，型号
       }, //填写单
@@ -369,7 +365,8 @@ export default {
 
     //每个物资添加额外的入库信息
     addExtraInf() {
-      const data = [];
+      let data = [];
+      let formdata = [];
       this.tableData.forEach((item) => {
         data.push({
           materialsName: item.name,
@@ -388,10 +385,24 @@ export default {
           isPut: 1 + "", //入库
           dispatchType: this.inRecordInf.dispatchType,
           category1: item.type[item.type.length - 1],
-          category2: ""
+          category2: "",
+          file: item.file,
         });
+        console.log(item);
       });
-      return data;
+
+      console.log(data);
+
+      data.forEach((item) => {
+        let value = new FormData();
+        let keys = Object.keys(item);
+        let values = Object.values(item);
+        for (let i = 0; i < keys.length; i++) {
+          value.append(keys[i], values[i]);
+        }
+        formdata.push(value);
+      });
+      return formdata;
     },
 
     //发送信息
@@ -475,7 +486,6 @@ export default {
         } else if (this.queryMap.count == 0) {
           this.$message.error("数量不能为0！");
         } else {
-          console.log(this.queryMap);
           this.addToTableData(this.queryMap);
           this.$message.success("添加成功！");
         }
@@ -485,7 +495,7 @@ export default {
     //删除一个
     deleteOne(data) {
       this.tableData = this.tableData.filter((item) => {
-        return item.id != data.id;
+        return item.name != data.name;
       });
       console.log(this.tableData);
     },
@@ -519,21 +529,26 @@ export default {
       }
     },
 
-    //加载图片
-    uploadImg(event) {
-      let file = document.getElementById("uploadInput");
-      var img = document.getElementById("picture"); //获得用户上传的图片节点
-      var reader = new FileReader();
-      // 转换成功后的操作，img.src即为转换后的DataURL
-      reader.onload = function (e) {
-        if (reader.readyState === 2) {
-          //加载完毕后赋值
-          img.src = e.target.result;
-        }
-      };
-      reader.readAsDataURL(file.files[0]);
-      this.queryMap.imgUrl = file.files[0];
+    // 发送请求前的函数
+    // file 里有全部的图片信息
+    beforeAvatarUpload(file) {
+      let imgType = file.type.toLowerCase();
+      let limitType = ["image/jpeg", "image/png", "image/jpg"];
+      const isLt2M = file.size / 1024 / 1024 < 2;
+      if (!limitType.includes(imgType)) {
+        this.$message.error("请检查上传头像图片格式!");
+      }
+      if (!isLt2M) {
+        this.$message.error("上传头像图片大小不能超过 2MB!");
+      }
+      // 预览图地址
+      this.queryMap.imgUrl = URL.createObjectURL(file);
+      // 图片信息
+      this.queryMap.file = file;
+      // 如果要阻止默认的发送行为，就返回 false
+      return false;
     },
+
   },
 };
 </script>

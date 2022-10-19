@@ -65,8 +65,8 @@
                 <template slot-scope="scope">
                   <el-popover placement="right" trigger="hover">
                     <img
-                      :src="scope.row.path"
-                      style="height: 200px; width: 200px"
+                      :src="scope.row.file"
+                      style=" width: 200px"
                       alt=""
                     />
                     <img
@@ -124,7 +124,7 @@ export default {
       selected: {},
       categorys: [],
       categorykeys: [],
-      stockName: "渝北空港物流库",
+      stockName: "大学城西永微电园临街仓库",
       stocks: [],
     };
   },

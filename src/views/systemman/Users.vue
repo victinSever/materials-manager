@@ -23,8 +23,23 @@
         <el-table-column prop="create_time" label="创建时间"></el-table-column>
         <el-table-column prop="recent_login" label="最近登陆时间"></el-table-column>
       </el-table>
+
+      <!--分页-->
+      <el-pagination
+        v-if="showPagination"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="this.pageNum"
+        :page-sizes="[10, 15, 20, 50]"
+        :page-size="this.pageSize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="this.total"
+        style="margin-top: 20px"
+      ></el-pagination>
       </el-col>
     </el-row>
+
+    
   </div>
 </template>
 
@@ -33,7 +48,11 @@ export default {
   name: "Users",
   data() {
     return {
+      total: 0,
       tableData: [],
+      pageSize: 10,
+      pageNum: 1,
+      showPagination: true,
     };
   },
   mounted() {
@@ -41,13 +60,19 @@ export default {
   },
   methods: {
     async searchAllUser() {
-      try {
-        const res = await this.$http.get("user/searchAllUser");
-        this.tableData = res.data.data.reverse();
-        console.log(res.data.data);
-      } catch (err) {
-        this.$message.error("获取信息错误！");
-      }
+      const { data: res } = await this.$http.get(
+        `/user/searchAllUser/${this.pageNum}/${this.pageSize}`
+      );
+      this.tableData = res.data.records;
+      this.total = res.data.total;
+    },
+    handleSizeChange(newSize) {
+      this.pageSize = newSize;
+      this.searchAllUser();
+    },
+    handleCurrentChange(newPage) {
+      this.pageNum = newPage;
+      this.searchAllUser();
     },
   },
 };

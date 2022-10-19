@@ -44,12 +44,15 @@
         <el-table-column label="操作" width="200px;">
           <template slot-scope="scope">
             <el-popover placement="right" width="400" trigger="hover">
+              <span>图片：</span>
               <image
                 style="width: 100px; height: 100px"
-                :src="scope.row.path"
+                :src="scope.row.file"
                 alt="该物资未上传图片"
+                v-if="scope.row.file"
               >
               </image>
+              <span v-else style="font-size: 14px">暂无</span>
               <el-link
                 :underline="false"
                 icon="el-icon-view"

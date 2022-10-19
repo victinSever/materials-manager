@@ -31,7 +31,7 @@
               </el-badge>
             </el-tooltip>
           </div>
-          <div class="user_avatar_message user_avatar_i">
+          <div class="user_avatar_message user_avatar_i" @click="$router.push('/loginLog')">
             <el-tooltip
               class="item"
               effect="light"
@@ -51,8 +51,8 @@
             </el-tooltip>
           </div>
           <el-dropdown>
-            <el-avatar class="user_avatar_img">
-              <img src="@/assets/images/admin.jpg" alt />
+            <el-avatar class="user_avatar_img" style="cursor: pointer">
+              <img src="@/assets/images/user.jpeg" alt />
             </el-avatar>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item>
@@ -416,7 +416,7 @@ export default {
               icon: "el-icon-view",
               orderNum: 1,
               open: 0,
-              disabled: true,
+              disabled: false,
               perms: "",
               type: 0,
               children: [],

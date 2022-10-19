@@ -357,7 +357,7 @@ export default {
           content: this.outRecordInf.reason,
           specification: item.specification,
           unite: item.unite,
-          isPut: "0",
+          isPut: 2,
           dispatchType: this.outRecordInf.dispatchType,
         };
       });
@@ -393,7 +393,7 @@ export default {
 
           //清空
           this.outRecordInf = {
-            userName: this.outRecordInf.userName
+            userName: this.outRecordInf.userName,
           };
           this.selectStock = [];
           this.$message.success("成功提交！");
@@ -407,15 +407,35 @@ export default {
 
     //addNum
     addNum(data, num) {
-      console.log(data, num);
       if (num > data.quantity) {
         return this.$message.error("数量不足！");
       } else if (num === "0") {
         return this.$message.error("数量不能为0！");
       }
-      data.sum = num; //选择的数量
+      data.sum = parseInt(num); //选择的数量
       this.selectNum = "";
-      this.selectStock.unshift(data);
+
+      //遍历已选择的物资进行去重
+      if (this.selectStock.length !== 0) {
+        for (let i = 0; i < this.selectStock.length; i++) {
+          // 名称相等则
+          if (data.name === this.selectStock[i].name) {
+            // 判断数量是否超出
+            var sum = data.sum + this.selectStock[i].addNum;
+            if (sum > this.selectStock[i].quantity) {
+              return this.$message.error("你选择的数量超出库存！");
+            } else {
+              this.selectStock[i].sum = sum; //将当前数量加上去
+              this.$forceUpdate(); //重新加载数据
+              return this.$message.success(
+                data.name + "已选择了" +  sum +""+ data.unite + "！"
+              );
+            }
+          }
+        }
+      }
+      this.selectStock.unshift(data); //将新物资添加
+      this.$message.success("你添加了"+ data.sum + data.unite + "的" + data.name + "！");
     },
 
     //获取信息
@@ -458,13 +478,12 @@ export default {
       const res = await this.$http.get("records/getDispatchType");
       let keys = Object.keys(res.data);
       let value = Object.values(res.data);
-      keys.forEach((item,index)=>{
+      keys.forEach((item, index) => {
         this.dispatchTypes.push({
           label: value[index],
-          value: item
-        })
-      })
-      console.log(this.dispatchTypes);
+          value: item,
+        });
+      });
     },
 
     //获取社区

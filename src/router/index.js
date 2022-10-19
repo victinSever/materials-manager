@@ -29,6 +29,9 @@ import Suppliers from '../views/businessman/suppliers.vue'
 import LoginLog from '../views/log/loginLog.vue'
 import Logs from '../views/log/logs.vue'
 
+//其他模块
+import Blog from '../views/other/blog.vue'
+
 
 
 Vue.use(VueRouter)
@@ -41,14 +44,14 @@ const routes = [{
         path: '/login',
         component: Login,
         meta: {
-            title: "物资管理系统 - 登陆"
+            title: "雪中送炭 - 雪中送炭"
         }
     },
     {
         path: '/register',
         component: Register,
         meta: {
-            title: "管理员注册"
+            title: "雪中送炭 - 管理员注册"
         }
     },
     {
@@ -61,21 +64,21 @@ const routes = [{
                 name: 'welcome',
                 component: Welcome,
                 meta: {
-                    title: "物资管理系统 - 主页"
+                    title: "雪中送炭 - 主页"
                 }
             },
             {
                 path: '/users', //用户信息
                 component: Users,
                 meta: {
-                    title: "用户"
+                    title: "雪中送炭 - 用户"
                 }
             },
             {
                 path: '/attachments', //附件信息
                 component: Atttachments,
                 meta: {
-                    title: "附件"
+                    title: "雪中送炭 - 附件"
                 }
             },
 
@@ -83,35 +86,35 @@ const routes = [{
                 path: '/stockList', //物资类别
                 component: StockList,
                 meta: {
-                    title: "物资调度记录"
+                    title: "雪中送炭 - 物资调度记录"
                 }
             },
             {
                 path: '/products', //物资类别
                 component: Products,
                 meta: {
-                    title: "物资资料"
+                    title: "雪中送炭 - 物资资料"
                 }
             },
             {
                 path: '/productCategorys', //物资类别
                 component: ProductCategorys,
                 meta: {
-                    title: "类别管理"
+                    title: "雪中送炭 - 类别管理"
                 }
             },
             {
                 path: '/stocks', //物资库存
                 component: Stocks,
                 meta: {
-                    title: "库存管理"
+                    title: "雪中送炭 - 库存管理"
                 }
             },
             {
                 path: '/operate', //物资发放
                 component: Operate,
                 meta: {
-                    title: "调度操作"
+                    title: "雪中送炭 - 调度操作"
                 }
             },
 
@@ -119,14 +122,14 @@ const routes = [{
                 path: '/consumers', //物资去处
                 component: Consumers,
                 meta: {
-                    title: "物资去处"
+                    title: "雪中送炭 - 物资去处"
                 }
             },
             {
                 path: '/suppliers', //物资来源
                 component: Suppliers,
                 meta: {
-                    title: "物资来源"
+                    title: "雪中送炭 - 物资来源"
                 }
             },
 
@@ -134,14 +137,14 @@ const routes = [{
                 path: '/map', //疫情地图
                 component: Map,
                 meta: {
-                    title: "疫情地图概览"
+                    title: "雪中送炭 - 疫情地图概览"
                 }
             },
             {
                 path: '/findData', //查看情况
                 component: FindData,
                 meta: {
-                    title: "查看情况"
+                    title: "雪中送炭 - 查看情况"
                 }
             },
 
@@ -149,14 +152,21 @@ const routes = [{
                 path: '/loginLog', //登录日志
                 component: LoginLog,
                 meta: {
-                    title: "登录日志"
+                    title: "雪中送炭 - 登录日志"
                 }
             },
             {
                 path: '/logs', //操作日志
                 component: Logs,
                 meta: {
-                    title: "操作日志"
+                    title: "雪中送炭 - 操作日志"
+                }
+            },
+            {
+                path: '/blog', //关于我们
+                component: Blog,
+                meta: {
+                    title: "雪中送炭 - 关于我们"
                 }
             },
 
@@ -165,7 +175,7 @@ const routes = [{
 ]
 
 const router = new VueRouter({
-    mode: 'history',
+    mode: 'hash',
     base: process.env.BASE_URL,
     routes
 })

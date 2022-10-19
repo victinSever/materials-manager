@@ -3,16 +3,24 @@
     <div class="topBox">
       <span>没有账号？ <router-link to="/register">去注册</router-link></span>
     </div>
-    <div class="containerBox">
+
       <!-- 背景 -->
-      <div class="wrap">
-        <div class="wall wall-front"></div>
-        <div class="wall wall-top"></div>
-        <div class="wall wall-bottom"></div>
-        <div class="wall wall-left"></div>
-        <div class="wall wall-right"></div>
-        <div class="wall wall-back"></div>
-      </div>
+      <section class="sky">
+        <span class="start"></span>
+        <span class="start"></span>
+        <span class="start"></span>
+        <span class="start"></span>
+        <span class="start"></span>
+        <span class="start"></span>
+        <span class="start"></span>
+        <span class="start"></span>
+        <span class="start"></span>
+        <span class="start"></span>
+        <span class="start"></span>
+        <span class="start"></span>
+        <span class="start"></span>
+        <span class="start"></span>
+      </section>
 
       <div class="form-box">
         <el-card>
@@ -33,7 +41,7 @@
             @submit.native.prevent
           >
             <!-- 标题 -->
-            <h1 class="title">医疗物资管理系统</h1>
+            <h1 class="title">雪中送炭</h1>
             <!-- 用户名 -->
             <el-form-item prop="account">
               <el-input
@@ -81,7 +89,7 @@
             </el-form-item>
 
             <!-- 记住密码 -->
-            <el-checkbox v-model="checked" style="margin-left: 130px"
+            <el-checkbox v-model="checked" style="margin-left: 130px;color: #fefefe"
               >记住密码</el-checkbox
             >
             <!-- 登录按钮 -->
@@ -110,7 +118,7 @@
           @close="close"
         />
       </div>
-    </div>
+   
   </div>
 </template>
 
@@ -145,7 +153,12 @@ export default {
         ],
         password: [
           { required: true, message: "请输入密码", trigger: "blur" },
-          { min: 4, max: 15, message: "长度在 4 到 15 个字符", trigger: "blur" },
+          {
+            min: 4,
+            max: 15,
+            message: "长度在 4 到 15 个字符",
+            trigger: "blur",
+          },
         ],
         verifyCode: [
           { required: true, message: "请输入验证码", trigger: "blur" },
@@ -216,6 +229,8 @@ export default {
         if (res.data.code === 404) {
           this.$message.error("账号或密码错误！");
           this.isShow = false;
+          this.formData.verifyCode = ''
+          this.uploadeImgCode()
         } else {
           const data = res.data.data;
 
@@ -243,10 +258,12 @@ export default {
           localStorage.setItem("recent_login", data.recent_login);
           this.$store.commit("setRecentLogin", data.recent_login); //存放用户信息
 
+          this.$router.push({ path: "/home" });
+
           this.$message.success(
             "登陆成功！欢迎，" + data.user.role + data.user.userName
           );
-          this.$router.push({ path: "/home" });
+
           location.reload();
         }
       } else {
@@ -270,6 +287,10 @@ export default {
 <style scoped>
 /* 引入特效css */
 @import url(../assets/css/login-style.css);
+
+.body {
+
+}
 
 .topBox {
   position: absolute;

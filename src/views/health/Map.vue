@@ -75,6 +75,7 @@
 
 <script>
 import jsonp from "jsonp";
+import "echarts/map/js/china";
 const option = {
   title: {
     text: "疫情地图",
